@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Physical AI Hackathon — 调查问卷</title>
+  <meta name="description" content="Physical AI Hackathon 调查问卷 — 沉浸式向导式 UI" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #020205;
+      --cyan: #00f0ff;
+      --pink: #ff2a6d;
+      --purple: #a855f7;
+      --glass: rgba(255, 255, 255, 0.07);
+      --glass-border: rgba(255, 255, 255, 0.12);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: #fff;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      overflow: hidden; /* wizard takes full screen */
+      line-height: 1.6;
+    }
+
+    /* Background */
+    .bg-scene {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      overflow: hidden;
+    }
+    .bg-scene img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: saturate(1.1) brightness(0.65) contrast(1.05);
+      transform: translate3d(var(--tx, 0px), var(--ty, 0px), 0) scale(1.05);
+      transition: transform 0.1s linear;
+    }
+    .vignette {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background: radial-gradient(circle at 50% 30%, transparent 0%, rgba(2,2,5,0.6) 50%, rgba(2,2,5,0.92) 100%);
+      pointer-events: none;
+    }
+    .noise {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      opacity: 0.035;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.4;
+      pointer-events: none;
+      z-index: -1;
+      mix-blend-mode: screen;
+    }
+    .orb-1 { width: 55vw; height: 55vw; background: radial-gradient(circle at 40% 40%, rgba(0,240,255,0.9) 0%, rgba(0,240,255,0) 60%); top: -12%; left: -12%; animation: drift-1 24s infinite alternate ease-in-out; }
+    .orb-2 { width: 45vw; height: 45vw; background: radial-gradient(circle at 50% 50%, rgba(255,42,109,0.85) 0%, rgba(255,42,109,0) 60%); bottom: -12%; right: -12%; animation: drift-2 28s infinite alternate-reverse ease-in-out; }
+    .orb-3 { width: 30vw; height: 30vw; background: radial-gradient(circle at 50% 50%, rgba(168,85,247,0.85) 0%, rgba(168,85,247,0) 60%); top: 50%; left: 50%; animation: drift-3 20s infinite alternate ease-in-out; }
+    @keyframes drift-1 { 0% { transform: translate3d(0,0,0) scale(1); } 100% { transform: translate3d(10vw, 8vh, 0) scale(1.1); } }
+    @keyframes drift-2 { 0% { transform: translate3d(0,0,0) scale(1); } 100% { transform: translate3d(-10vw, -10vh, 0) scale(1.15); } }
+    @keyframes drift-3 { 0% { transform: translate3d(0,0,0) scale(1); } 100% { transform: translate3d(-8vw, 6vh, 0) scale(1.1); } }
+
+    /* Layout */
+    .survey-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 5vw;
+      position: relative;
+    }
+
+    /* Logo / header */
+    .survey-header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 5vw;
+      background: linear-gradient(to bottom, rgba(2,2,5,0.85), transparent);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      background: linear-gradient(90deg, #fff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .survey-header .close {
+      color: rgba(255,255,255,0.5);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: color 0.3s;
+    }
+    .survey-header .close:hover { color: #fff; }
+
+    /* Card */
+    .survey-card {
+      width: 100%;
+      max-width: 720px;
+      background: var(--glass);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid var(--glass-border);
+      border-radius: 2rem;
+      padding: 2.5rem;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08);
+      position: relative;
+      overflow: hidden;
+    }
+    .survey-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      opacity: 0.6;
+    }
+
+    /* Progress */
+    .progress-track {
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 2.5rem;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--cyan), var(--purple), var(--pink));
+      box-shadow: 0 0 20px rgba(0,240,255,0.4);
+      border-radius: 999px;
+      transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .step-dots {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      transition: all 0.35s;
+    }
+    .dot.active {
+      width: 24px;
+      border-radius: 999px;
+      background: var(--cyan);
+      box-shadow: 0 0 12px var(--cyan);
+    }
+    .dot.filled {
+      background: rgba(0,240,255,0.6);
+    }
+
+    /* Step content */
+    .step {
+      display: none;
+      animation: fadeIn 0.45s ease;
+    }
+    .step.active {
+      display: block;
+    }
+    .step.prev-out { animation: slideOutLeft 0.35s ease forwards; }
+    .step.next-out { animation: slideOutRight 0.35s ease forwards; }
+    .step.prev-in { animation: slideInRight 0.45s ease; }
+    .step.next-in { animation: slideInLeft 0.45s ease; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes slideInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes slideOutRight { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(30px); } }
+    @keyframes slideOutLeft { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(-30px); } }
+
+    .question-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.45);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+    }
+    .question-label::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 8px var(--cyan);
+    }
+    .question-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.5rem, 4vw, 2.25rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 2rem;
+      background: linear-gradient(90deg, #fff, #cbd5e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Options */
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+    .option-card {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.15rem 1.25rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 1rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+    .option-card:hover {
+      background: rgba(255,255,255,0.07);
+      border-color: rgba(255,255,255,0.25);
+      transform: translateX(4px);
+    }
+    .option-card.selected {
+      background: rgba(0,240,255,0.08);
+      border-color: rgba(0,240,255,0.55);
+      box-shadow: 0 0 24px rgba(0,240,255,0.15), inset 0 1px 0 rgba(255,255,255,0.08);
+      transform: translateX(6px);
+    }
+    .option-card input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .option-indicator {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.25);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      transition: all 0.25s;
+    }
+    .option-card.selected .option-indicator {
+      border-color: var(--cyan);
+      background: rgba(0,240,255,0.15);
+      box-shadow: 0 0 12px rgba(0,240,255,0.3);
+    }
+    .option-indicator::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      transform: scale(0);
+      transition: transform 0.25s;
+      box-shadow: 0 0 8px var(--cyan);
+    }
+    .option-card.selected .option-indicator::after { transform: scale(1); }
+    .option-text {
+      font-size: 1rem;
+      color: rgba(255,255,255,0.85);
+      font-weight: 500;
+    }
+    .option-card.selected .option-text { color: #fff; }
+
+    /* Text inputs */
+    .glass-input {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 1rem;
+      color: #fff;
+      font-size: 1rem;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.25s;
+    }
+    .glass-input::placeholder { color: rgba(255,255,255,0.35); }
+    .glass-input:focus {
+      background: rgba(255,255,255,0.07);
+      border-color: rgba(0,240,255,0.55);
+      box-shadow: 0 0 20px rgba(0,240,255,0.15);
+    }
+    textarea.glass-input {
+      min-height: 140px;
+      resize: vertical;
+    }
+
+    /* Navigation */
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2.5rem;
+      gap: 1rem;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.95rem 1.75rem;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: none;
+      font-family: inherit;
+    }
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.7);
+    }
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.07);
+      color: #fff;
+      border-color: rgba(255,255,255,0.35);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, rgba(0,240,255,0.18), rgba(168,85,247,0.12));
+      border: 1px solid rgba(0,240,255,0.45);
+      color: #fff;
+      box-shadow: 0 0 25px rgba(0,240,255,0.2), inset 0 1px 0 rgba(255,255,255,0.12);
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 40px rgba(0,240,255,0.35);
+      border-color: rgba(0,240,255,0.7);
+    }
+    .btn-primary::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.6s;
+    }
+    .btn-primary:hover::after { transform: translateX(100%); }
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn-primary .arrow { transition: transform 0.3s; }
+    .btn-primary:hover .arrow { transform: translateX(4px); }
+
+    /* Success / summary */
+    .success-screen {
+      display: none;
+      text-align: center;
+      animation: fadeIn 0.6s ease;
+    }
+    .success-screen.active { display: block; }
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1.5rem;
+      border-radius: 50%;
+      background: rgba(0,240,255,0.1);
+      border: 1px solid rgba(0,240,255,0.4);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 0 40px rgba(0,240,255,0.25);
+    }
+    .success-icon svg {
+      width: 40px;
+      height: 40px;
+      stroke: var(--cyan);
+      stroke-width: 2.5;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .success-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      background: linear-gradient(90deg, #fff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .success-text { color: rgba(255,255,255,0.6); margin-bottom: 2rem; }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .survey-card { padding: 1.75rem; border-radius: 1.5rem; }
+      .option-card { padding: 1rem 1.1rem; }
+      .nav-buttons { flex-direction: column-reverse; }
+      .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-scene">
+    <img id="bg-img" src="bg1.jpeg" alt="Physical AI Hackathon background" />
+  </div>
+  <div class="vignette"></div>
+  <div class="noise"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <header class="survey-header">
+    <div class="logo">Physical AI Hackathon</div>
+    <a href="#" class="close">退出</a>
+  </header>
+
+  <main class="survey-shell">
+    <div class="survey-card" id="survey-card">
+      <!-- Progress -->
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <div class="step-dots" id="step-dots"></div>
+
+      <!-- Steps container -->
+      <div id="steps-container"></div>
+
+      <!-- Success screen -->
+      <div class="success-screen" id="success-screen">
+        <div class="success-icon">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </div>
+        <h2 class="success-title">提交成功</h2>
+        <p class="success-text">感谢你的反馈，我们已收到你的问卷。</p>
+        <button class="btn btn-primary" onclick="location.reload()">再填一份</button>
+      </div>
+
+      <!-- Navigation -->
+      <div class="nav-buttons" id="nav-buttons">
+        <button class="btn btn-secondary" id="prev-btn" onclick="goPrev()">上一步</button>
+        <button class="btn btn-primary" id="next-btn" onclick="goNext()">
+          下一步 <span class="arrow">→</span>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const questions = [
+      {
+        id: 'role',
+        type: 'single',
+        title: '你在 Physical AI 领域扮演什么角色？',
+        options: ['研究者 / 学者', '工程师 / 开发者', '创业者 / 产品经理', '学生 / 爱好者', '投资人 / 机构代表'],
+        required: true
+      },
+      {
+        id: 'interest',
+        type: 'single',
+        title: '你最关注哪个方向？',
+        options: ['具身智能 / 机器人', '传感器与边缘 AI', '物理仿真 / 世界模型', '人机交互 / 灵巧操作', '其他'],
+        required: true
+      },
+      {
+        id: 'experience',
+        type: 'single',
+        title: '你是否有硬件/机器人项目经验？',
+        options: ['有，已参与过落地项目', '有，处于实验/研究阶段', '没有，但有软件 AI 经验', '完全新手，来学习'],
+        required: true
+      },
+      {
+        id: 'goal',
+        type: 'text',
+        title: '你参加这次 Hackathon 的主要目标是什么？',
+        placeholder: '例如：寻找队友、验证想法、学习技术、融资展示……',
+        required: true
+      },
+      {
+        id: 'team',
+        type: 'single',
+        title: '你目前是否已经组队？',
+        options: ['已有完整团队', '有部分队友，还缺人', '想在现场组队', '暂时想单人参加'],
+        required: true
+      },
+      {
+        id: 'suggestion',
+        type: 'textarea',
+        title: '对赛事组织或题目设置，你还有什么建议？',
+        placeholder: '畅所欲言，帮助我们做得更好……',
+        required: false
+      }
+    ];
+
+    let currentStep = 0;
+    const answers = {};
+
+    const container = document.getElementById('steps-container');
+    const dotsContainer = document.getElementById('step-dots');
+    const progressFill = document.getElementById('progress-fill');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const successScreen = document.getElementById('success-screen');
+    const navButtons = document.getElementById('nav-buttons');
+
+    function init() {
+      questions.forEach((q, index) => {
+        // create dot
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        dot.id = `dot-${index}`;
+        dotsContainer.appendChild(dot);
+
+        // create step
+        const step = document.createElement('div');
+        step.className = 'step';
+        step.id = `step-${index}`;
+        step.innerHTML = buildStepHTML(q, index);
+        container.appendChild(step);
+      });
+      render();
+    }
+
+    function buildStepHTML(q, index) {
+      const label = `问题 ${index + 1} / ${questions.length}`;
+      let body = '';
+
+      if (q.type === 'single') {
+        body = `<div class="options">` + q.options.map((opt, i) => `
+          <label class="option-card" onclick="selectOption('${q.id}', '${escapeHTML(opt)}', this)">
+            <input type="radio" name="${q.id}" value="${escapeHTML(opt)}" ${answers[q.id] === opt ? 'checked' : ''}>
+            <span class="option-indicator"></span>
+            <span class="option-text">${escapeHTML(opt)}</span>
+          </label>
+        `).join('') + `</div>`;
+      } else if (q.type === 'text') {
+        body = `<input type="text" class="glass-input" id="input-${q.id}" placeholder="${q.placeholder || ''}" value="${answers[q.id] ? escapeHTML(answers[q.id]) : ''}" oninput="updateText('${q.id}', this.value)">`;
+      } else if (q.type === 'textarea') {
+        body = `<textarea class="glass-input" id="input-${q.id}" placeholder="${q.placeholder || ''}" oninput="updateText('${q.id}', this.value)">${answers[q.id] ? escapeHTML(answers[q.id]) : ''}</textarea>`;
+      }
+
+      return `
+        <div class="question-label">${label}</div>
+        <h2 class="question-title">${escapeHTML(q.title)}</h2>
+        ${body}
+      `;
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m]));
+    }
+
+    function selectOption(id, value, card) {
+      answers[id] = value;
+      // visual update
+      const step = document.getElementById(`step-${currentStep}`);
+      step.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      // check radio
+      const input = card.querySelector('input');
+      if (input) input.checked = true;
+      updateButtons();
+    }
+
+    function updateText(id, value) {
+      answers[id] = value;
+      updateButtons();
+    }
+
+    function render() {
+      // update dots
+      questions.forEach((q, i) => {
+        const dot = document.getElementById(`dot-${i}`);
+        dot.className = 'dot';
+        if (i === currentStep) dot.classList.add('active');
+        else if (answers[q.id] && answers[q.id].toString().trim() !== '') dot.classList.add('filled');
+      });
+
+      // update steps
+      document.querySelectorAll('.step').forEach((step, i) => {
+        step.classList.remove('active');
+      });
+      const activeStep = document.getElementById(`step-${currentStep}`);
+      activeStep.classList.add('active');
+
+      // progress
+      const progress = ((currentStep) / (questions.length - 1)) * 100;
+      progressFill.style.width = `${progress}%`;
+
+      // buttons
+      prevBtn.style.visibility = currentStep === 0 ? 'hidden' : 'visible';
+      nextBtn.innerHTML = currentStep === questions.length - 1 ? '提交 <span class="arrow">→</span>' : '下一步 <span class="arrow">→</span>';
+      updateButtons();
+    }
+
+    function isCurrentValid() {
+      const q = questions[currentStep];
+      if (!q.required) return true;
+      const ans = answers[q.id];
+      return ans && ans.toString().trim() !== '';
+    }
+
+    function updateButtons() {
+      nextBtn.disabled = !isCurrentValid();
+    }
+
+    function goNext() {
+      if (!isCurrentValid()) return;
+      if (currentStep < questions.length - 1) {
+        const oldStep = document.getElementById(`step-${currentStep}`);
+        oldStep.classList.add('next-out');
+        setTimeout(() => {
+          oldStep.classList.remove('active', 'next-out');
+          currentStep++;
+          const newStep = document.getElementById(`step-${currentStep}`);
+          newStep.classList.add('active', 'next-in');
+          setTimeout(() => newStep.classList.remove('next-in'), 450);
+          render();
+        }, 300);
+      } else {
+        submitSurvey();
+      }
+    }
+
+    function goPrev() {
+      if (currentStep > 0) {
+        const oldStep = document.getElementById(`step-${currentStep}`);
+        oldStep.classList.add('prev-out');
+        setTimeout(() => {
+          oldStep.classList.remove('active', 'prev-out');
+          currentStep--;
+          const newStep = document.getElementById(`step-${currentStep}`);
+          newStep.classList.add('active', 'prev-in');
+          setTimeout(() => newStep.classList.remove('prev-in'), 450);
+          render();
+        }, 300);
+      }
+    }
+
+    function submitSurvey() {
+      console.log('Survey answers:', answers);
+      container.style.display = 'none';
+      dotsContainer.style.display = 'none';
+      progressFill.parentElement.style.display = 'none';
+      navButtons.style.display = 'none';
+      successScreen.classList.add('active');
+    }
+
+    // Keyboard nav
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        goNext();
+      } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        goNext();
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        goPrev();
+      }
+    });
+
+    // Mouse parallax on background
+    const bg = document.getElementById('bg-img');
+    document.addEventListener('mousemove', (e) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 2;
+      const y = (e.clientY / window.innerHeight - 0.5) * 2;
+      bg.style.setProperty('--tx', (x * -10) + 'px');
+      bg.style.setProperty('--ty', (y * -10) + 'px');
+    }, { passive: true });
+
+    init();
+  </script>
+</body>
+</html>

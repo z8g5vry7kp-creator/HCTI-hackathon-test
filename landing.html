@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Physical AI Hackathon — 2026</title>
+  <meta name="description" content="Physical AI Hackathon 落地页：当算法进入原子世界，48 小时重新定义物理智能。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #020205;
+      --cyan: #00f0ff;
+      --pink: #ff2a6d;
+      --purple: #a855f7;
+      --silver: #e2e8f0;
+      --glass: rgba(255, 255, 255, 0.06);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: #fff;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* ---------- Background scene ---------- */
+    .bg-scene {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      overflow: hidden;
+    }
+    .bg-scene img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: saturate(1.1) brightness(0.7) contrast(1.05);
+      transform: scale(1.05);
+      transition: transform 0.1s linear;
+      --tx: 0px;
+      --ty: 0px;
+      transform: translate3d(var(--tx), var(--ty), 0) scale(1.05);
+    }
+    .vignette {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background: radial-gradient(circle at 50% 25%, transparent 0%, rgba(2,2,5,0.55) 55%, rgba(2,2,5,0.92) 100%);
+      pointer-events: none;
+    }
+    .noise {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      opacity: 0.035;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+
+    /* ---------- Floating orbs ---------- */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.45;
+      pointer-events: none;
+      z-index: -1;
+      mix-blend-mode: screen;
+      will-change: transform;
+    }
+    .orb-1 {
+      width: 55vw;
+      height: 55vw;
+      background: radial-gradient(circle at 40% 40%, rgba(0,240,255,0.9) 0%, rgba(0,240,255,0) 60%);
+      top: -10%;
+      left: -10%;
+      animation: drift-1 22s infinite alternate ease-in-out;
+    }
+    .orb-2 {
+      width: 45vw;
+      height: 45vw;
+      background: radial-gradient(circle at 50% 50%, rgba(255,42,109,0.85) 0%, rgba(255,42,109,0) 60%);
+      bottom: -15%;
+      right: -10%;
+      animation: drift-2 26s infinite alternate-reverse ease-in-out;
+    }
+    .orb-3 {
+      width: 32vw;
+      height: 32vw;
+      background: radial-gradient(circle at 50% 50%, rgba(168,85,247,0.85) 0%, rgba(168,85,247,0) 60%);
+      top: 45%;
+      left: 55%;
+      animation: drift-3 18s infinite alternate ease-in-out;
+    }
+    @keyframes drift-1 {
+      0% { transform: translate3d(0, 0, 0) scale(1); }
+      100% { transform: translate3d(12vw, 8vh, 0) scale(1.12); }
+    }
+    @keyframes drift-2 {
+      0% { transform: translate3d(0, 0, 0) scale(1); }
+      100% { transform: translate3d(-10vw, -10vh, 0) scale(1.18); }
+    }
+    @keyframes drift-3 {
+      0% { transform: translate3d(0, 0, 0) scale(1); }
+      100% { transform: translate3d(-8vw, 6vh, 0) scale(1.1); }
+    }
+
+    /* ---------- Navigation ---------- */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.2rem 5vw;
+      background: linear-gradient(to bottom, rgba(2,2,5,0.85), transparent 100%);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+      background: linear-gradient(90deg, #fff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2.25rem;
+    }
+    .nav-links a {
+      color: rgba(255,255,255,0.65);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.3s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0;
+      width: 0; height: 1px;
+      background: var(--cyan);
+      transition: width 0.3s;
+    }
+    .nav-links a:hover {
+      color: var(--cyan);
+    }
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 8rem 5vw 4rem;
+      position: relative;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.45rem 1.1rem;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 999px;
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.85);
+      margin-bottom: 2.25rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .eyebrow::before {
+      content: '';
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 12px var(--cyan);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.1); }
+    }
+    .hero h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(3.5rem, 13vw, 11rem);
+      font-weight: 700;
+      line-height: 0.92;
+      letter-spacing: -0.045em;
+      background: linear-gradient(
+        180deg,
+        #ffffff 0%,
+        #cbd5e1 38%,
+        #ffffff 55%,
+        #94a3b8 100%
+      );
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 60px rgba(0,240,255,0.25), 0 0 120px rgba(168,85,247,0.18);
+      margin-bottom: 1.5rem;
+    }
+    .hero .subtitle {
+      font-size: clamp(1.05rem, 2.4vw, 1.55rem);
+      color: rgba(255,255,255,0.65);
+      max-width: 720px;
+      margin-bottom: 2.75rem;
+      font-weight: 300;
+    }
+
+    /* Countdown */
+    .countdown {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2.75rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .countdown .unit {
+      min-width: 88px;
+      padding: 1.1rem 1rem;
+      background: var(--glass);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 1.1rem;
+      text-align: center;
+      transition: transform 0.3s, border-color 0.3s;
+    }
+    .countdown .unit:hover {
+      transform: translateY(-4px);
+      border-color: rgba(0,240,255,0.3);
+    }
+    .countdown .number {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2.4rem;
+      font-weight: 700;
+      display: block;
+      line-height: 1;
+      margin-bottom: 0.3rem;
+      background: linear-gradient(180deg, #fff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .countdown .label {
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.45);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 2.5rem;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: all 0.35s ease;
+      box-shadow: 0 0 25px rgba(0,240,255,0.15), inset 0 1px 0 rgba(255,255,255,0.15);
+      position: relative;
+      overflow: hidden;
+    }
+    .cta::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.6s;
+    }
+    .cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 45px rgba(0,240,255,0.35);
+      border-color: rgba(0,240,255,0.5);
+    }
+    .cta:hover::before {
+      transform: translateX(100%);
+    }
+
+    /* ---------- Sections ---------- */
+    section {
+      padding: 7rem 5vw;
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2rem, 5.5vw, 3.75rem);
+      font-weight: 700;
+      margin-bottom: 1rem;
+      background: linear-gradient(90deg, #fff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+    .section-subtitle {
+      color: rgba(255,255,255,0.55);
+      max-width: 640px;
+      margin-bottom: 3rem;
+      font-weight: 300;
+      font-size: 1.05rem;
+    }
+
+    /* Glass card */
+    .glass-card {
+      background: var(--glass);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 2rem;
+      padding: 2.5rem;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.35);
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 2rem;
+    }
+    .info-item h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .info-item p {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    /* Tracks */
+    .tracks-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+    .track-card {
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 1.5rem;
+      padding: 2rem;
+      transition: transform 0.35s, border-color 0.35s;
+      position: relative;
+      overflow: hidden;
+      cursor: default;
+    }
+    .track-card:hover {
+      transform: translateY(-7px);
+      border-color: rgba(0,240,255,0.35);
+    }
+    .track-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 0%, rgba(0,240,255,0.16), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.35s;
+    }
+    .track-card:hover::before { opacity: 1; }
+    .track-card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.5rem;
+      margin-bottom: 0.75rem;
+      color: #fff;
+      position: relative;
+      z-index: 1;
+    }
+    .track-card p {
+      color: rgba(255,255,255,0.55);
+      font-size: 0.95rem;
+      position: relative;
+      z-index: 1;
+    }
+    .track-card .tag {
+      display: inline-block;
+      margin-top: 1.25rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.15);
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.6);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Final CTA */
+    .final-cta {
+      text-align: center;
+      padding: 8rem 5vw;
+      max-width: 1000px;
+      position: relative;
+    }
+    .final-cta h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2.5rem, 7vw, 5.5rem);
+      font-weight: 700;
+      line-height: 1.05;
+      margin-bottom: 2.25rem;
+      background: linear-gradient(180deg, #fff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 80px rgba(0,240,255,0.2);
+    }
+    .big-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem 3.5rem;
+      border-radius: 999px;
+      border: 1px solid rgba(0,240,255,0.55);
+      background: rgba(0,240,255,0.08);
+      color: #fff;
+      font-size: 1.15rem;
+      font-weight: 700;
+      text-decoration: none;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: all 0.35s;
+      box-shadow: 0 0 35px rgba(0,240,255,0.2), inset 0 1px 0 rgba(255,255,255,0.12);
+      position: relative;
+      overflow: hidden;
+    }
+    .big-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.7s;
+    }
+    .big-btn:hover {
+      background: rgba(0,240,255,0.2);
+      box-shadow: 0 0 70px rgba(0,240,255,0.45);
+      transform: scale(1.03);
+    }
+    .big-btn:hover::after {
+      transform: translateX(100%);
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 3.5rem 5vw;
+      color: rgba(255,255,255,0.3);
+      font-size: 0.85rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Reveal animation */
+    .reveal {
+      opacity: 0;
+      transform: translateY(50px);
+      transition: opacity 0.9s ease, transform 0.9s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .countdown { gap: 0.6rem; }
+      .countdown .unit { min-width: 68px; padding: 0.9rem 0.5rem; }
+      .countdown .number { font-size: 1.8rem; }
+      section { padding: 4.5rem 5vw; }
+      .glass-card { padding: 1.75rem; border-radius: 1.5rem; }
+      .final-cta { padding: 5rem 5vw; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-scene">
+    <img id="bg-img" src="bg1.jpeg" alt="Physical AI Hackathon background" />
+  </div>
+  <div class="vignette"></div>
+  <div class="noise"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <nav>
+    <div class="logo">Physical AI</div>
+    <div class="nav-links">
+      <a href="#about">About</a>
+      <a href="#tracks">Tracks</a>
+      <a href="#register">Register</a>
+    </div>
+  </nav>
+
+  <main>
+    <section class="hero">
+      <div class="eyebrow">Global Hackathon 2026</div>
+      <h1>Physical AI<br>Hackathon</h1>
+      <p class="subtitle">让算法长出骨骼、让模型感知世界。48 小时，重新定义物理智能。</p>
+      <div class="countdown" id="countdown">
+        <div class="unit"><span class="number" id="days">00</span><span class="label">Days</span></div>
+        <div class="unit"><span class="number" id="hours">00</span><span class="label">Hours</span></div>
+        <div class="unit"><span class="number" id="minutes">00</span><span class="label">Mins</span></div>
+        <div class="unit"><span class="number" id="seconds">00</span><span class="label">Secs</span></div>
+      </div>
+      <a href="#register" class="cta">立即报名 →</a>
+    </section>
+
+    <section id="about" class="reveal">
+      <h2 class="section-title">赛事信息</h2>
+      <p class="section-subtitle">从虚拟仿真到真实世界，Physical AI 正在打开下一扇大门。</p>
+      <div class="glass-card info-grid">
+        <div class="info-item">
+          <h3>时间</h3>
+          <p>2026.08.15 — 08.17</p>
+        </div>
+        <div class="info-item">
+          <h3>地点</h3>
+          <p>中国 · 深圳</p>
+        </div>
+        <div class="info-item">
+          <h3>形式</h3>
+          <p>48 小时线下黑客松</p>
+        </div>
+        <div class="info-item">
+          <h3>奖金池</h3>
+          <p>¥ 500,000+</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="tracks" class="reveal">
+      <h2 class="section-title">四大赛道</h2>
+      <p class="section-subtitle">选择你的方向，在硬件与算法的交界地带突破极限。</p>
+      <div class="tracks-grid">
+        <div class="track-card">
+          <h3>具身智能</h3>
+          <p>机器人大脑、运动控制、多模态感知与决策系统。</p>
+          <span class="tag">Embodied AI</span>
+        </div>
+        <div class="track-card">
+          <h3>传感器与边缘 AI</h3>
+          <p>低功耗感知、事件相机、触觉传感器与端侧推理。</p>
+          <span class="tag">Edge Intelligence</span>
+        </div>
+        <div class="track-card">
+          <h3>物理仿真</h3>
+          <p>数字孪生、可微分物理、世界模型与强化学习环境。</p>
+          <span class="tag">Simulation</span>
+        </div>
+        <div class="track-card">
+          <h3>人机交互</h3>
+          <p>灵巧手、外骨骼、脑机接口与自然语言操控。</p>
+          <span class="tag">Human-AI</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta reveal" id="register">
+      <h2>Ready to build<br>the physical future?</h2>
+      <a href="#" class="big-btn">立即报名</a>
+    </section>
+  </main>
+
+  <footer>
+    © 2026 Physical AI Hackathon. Landing page designed by 速构构.
+  </footer>
+
+  <script>
+    // Countdown
+    const target = new Date('2026-08-15T09:00:00+08:00').getTime();
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const diff = Math.max(0, target - now);
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+      document.getElementById('days').textContent = String(days).padStart(2, '0');
+      document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+      document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+      document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+    }
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    // Reveal on scroll
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -50px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Subtle mouse parallax on background
+    const bg = document.getElementById('bg-img');
+    let mouseX = 0, mouseY = 0;
+    document.addEventListener('mousemove', (e) => {
+      mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+      mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+      const tx = mouseX * -12;
+      const ty = mouseY * -12;
+      bg.style.setProperty('--tx', tx + 'px');
+      bg.style.setProperty('--ty', ty + 'px');
+    }, { passive: true });
+  </script>
+</body>
+</html>
