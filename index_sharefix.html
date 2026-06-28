@@ -1557,15 +1557,15 @@
       setTimeout(() => document.body.classList.remove("lang-glitching"), 350);
 
       const hkActive = document.getElementById('hk-overlay').classList.contains('active');
-      const resultActive = resultOverlay.classList.contains('active');
+      const resultActive = getResultOverlay().classList.contains('active');
 
       if (quizOverlay.classList.contains('active')) {
         questionCard.classList.add('switching');
         setTimeout(() => { renderQuestion(); questionCard.classList.remove('switching'); }, 160);
       }
       if (resultActive) {
-        resultOverlay.style.opacity = '0';
-        setTimeout(() => { showResult(); resultOverlay.style.opacity = '1'; }, 120);
+        getResultOverlay().style.opacity = '0';
+        setTimeout(() => { showResult(); getResultOverlay().style.opacity = '1'; }, 120);
       }
       if (hkActive) {
         document.getElementById('hk-picker-title').textContent = __('hkPickerTitle');
@@ -2275,7 +2275,7 @@
 
     // ==================== DOM REFS ====================
     const quizOverlay = document.getElementById('quiz-overlay');
-    const resultOverlay = document.getElementById('result-overlay');
+    function getResultOverlay() { return document.getElementById('result-overlay'); }
         const questionNumber = document.getElementById('question-number');
     const questionTitle = document.getElementById('question-title');
     const optionsEl = document.getElementById('options');
@@ -2286,11 +2286,11 @@
     const questionCard = document.getElementById('question-card');
 
     // ==================== OVERLAY HELPERS ====================
-        function showQuiz() { if (!state.shuffles.length) initShuffles(); if (!state.shuffles || !state.shuffles.length) initShuffles(); quizOverlay.classList.add('active'); resultOverlay.classList.remove('active'); document.body.style.overflow = 'hidden'; const hl=document.getElementById('hero-lang-switch'); if(hl) hl.style.display='none'; }
-    function hideQuiz() { quizOverlay.classList.remove('active'); resultOverlay.classList.remove('active'); document.getElementById('hk-overlay').classList.remove('active'); document.body.style.overflow = ''; const hl=document.getElementById('hero-lang-switch'); if(hl) hl.style.display=''; }
+        function showQuiz() { if (!state.shuffles.length) initShuffles(); if (!state.shuffles || !state.shuffles.length) initShuffles(); quizOverlay.classList.add('active'); getResultOverlay().classList.remove('active'); document.body.style.overflow = 'hidden'; const hl=document.getElementById('hero-lang-switch'); if(hl) hl.style.display='none'; }
+    function hideQuiz() { quizOverlay.classList.remove('active'); getResultOverlay().classList.remove('active'); document.getElementById('hk-overlay').classList.remove('active'); document.body.style.overflow = ''; const hl=document.getElementById('hero-lang-switch'); if(hl) hl.style.display=''; }
     function showResultOverlay() {
       quizOverlay.classList.remove('active');
-      resultOverlay.classList.add('active');
+      getResultOverlay().classList.add('active');
     }
 
     // ==================== RENDER QUESTION ====================
@@ -2768,7 +2768,7 @@
 
   <div class="qr-modal" id="qr-modal" onclick="this.classList.remove('active')">
     <button class="qr-modal-close" onclick="event.stopPropagation();document.getElementById('qr-modal').classList.remove('active')">×</button>
-    <img src="qr-community.png" alt="扫码加入黑客松社群" onclick="event.stopPropagation()">
+    <img src="qr-community.png" loading="lazy" alt="扫码加入黑客松社群" onclick="event.stopPropagation()">
   </div>
 
   <div class="share-loading" id="share-loading" style="display:none"><div class="spinner"></div></div>
