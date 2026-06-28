@@ -2285,7 +2285,9 @@
     const questionCard = document.getElementById('question-card');
 
     // ==================== OVERLAY HELPERS ====================
-        function showQuiz() { if (!state.shuffles.length) initShuffles(); if (!state.shuffles || !state.shuffles.length) initShuffles(); quizOverlay.classList.add('active'); getResultOverlay().classList.remove('active'); document.body.style.overflow = 'hidden'; const hl=document.getElementById('hero-lang-switch'); if(hl) hl.style.display='none'; }
+        var _preloaded = false;
+        function preloadImages() { if (_preloaded) return; _preloaded = true; personas.forEach(function(p) { if (p.img) { var img = new Image(); img.src = p.img; } }); }
+        function showQuiz() { if (!state.shuffles.length) initShuffles(); if (!state.shuffles || !state.shuffles.length) initShuffles(); quizOverlay.classList.add('active'); getResultOverlay().classList.remove('active'); document.body.style.overflow = 'hidden'; const hl=document.getElementById('hero-lang-switch'); if(hl) hl.style.display='none'; preloadImages(); }
     function hideQuiz() { quizOverlay.classList.remove('active'); getResultOverlay().classList.remove('active'); document.getElementById('hk-overlay').classList.remove('active'); document.body.style.overflow = ''; const hl=document.getElementById('hero-lang-switch'); if(hl) hl.style.display=''; }
     function showResultOverlay() {
       quizOverlay.classList.remove('active');
