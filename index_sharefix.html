@@ -131,7 +131,7 @@
       animation: intro-auto-exit 0.01s forwards;
       animation-delay: 2.3s;
     }
-    @keyframes intro-auto-exit { to { opacity: 0; transform: scale(1.08); visibility: hidden; } }
+    @keyframes intro-auto-exit { from { pointer-events: none; } to { opacity: 0; transform: scale(1.08); visibility: hidden; pointer-events: none; } }
     .intro-overlay.exiting {
       opacity: 0;
       transform: scale(1.08);
@@ -322,7 +322,7 @@
       animation: hero-auto-show 0.01s forwards;
       animation-delay: 2.3s;
     }
-    @keyframes hero-auto-show { to { opacity: 1; } }
+    @keyframes hero-auto-show { from { pointer-events: auto; } to { opacity: 1; pointer-events: auto; } }
     .hero.visible { opacity: 1; }
     .hero .eyebrow {
       display: inline-flex;
