@@ -54,7 +54,6 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      filter: saturate(1.1) brightness(0.7) contrast(1.05);
       transition: transform 0.1s linear;
       --tx: 0px;
       --ty: 0px;
@@ -1450,7 +1449,7 @@
   <script>
 
     // ==================== INTRO ANIMATION ====================
-    (    (function startIntro() {
+    (function startIntro() {
       var overlay = document.getElementById('intro-overlay');
       var status = document.getElementById('intro-status');
       var termsEl = document.getElementById('intro-terms');
@@ -2764,7 +2763,6 @@
     });
   
 </script>
-<div class="share-loading" id="share-loading" style="display:none"><div class="spinner"></div></div>
 
   <div class="qr-modal" id="qr-modal" onclick="this.classList.remove('active')">
     <button class="qr-modal-close" onclick="event.stopPropagation();document.getElementById('qr-modal').classList.remove('active')">×</button>
