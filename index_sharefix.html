@@ -2419,7 +2419,10 @@
 
     // ==================== RENDER QUESTION ====================
     function renderQuestion() {
+      if (state.current >= questions.length) { questionCard.classList.remove('switching'); randHK(); showResult(); return; }
+      if (state.current < 0) state.current = 0;
       const q = getQuestion(state.current);
+      if (!q) { questionCard.classList.remove('switching'); return; }
       const abCls = q.ab.toLowerCase();
       const st = getMtrStation(abCls);
 
@@ -2470,6 +2473,8 @@
     }
 
     function switchToQuestion(idx) {
+      if (idx >= questions.length) { questionCard.classList.remove('switching'); clearTimeout(state._autoTimer); randHK(); showResult(); return; }
+      if (idx < 0) idx = 0;
       questionCard.classList.add('switching');
       clearTimeout(state._switchTimer);
       state._switchTimer = setTimeout(() => {
@@ -2484,7 +2489,8 @@
       renderQuestion();
       if (state.current < questions.length - 1) {
         clearTimeout(state._autoTimer);
-        state._autoTimer = setTimeout(() => switchToQuestion(state.current + 1), 380);
+        const _nextIdx = state.current + 1;
+        state._autoTimer = setTimeout(() => switchToQuestion(_nextIdx), 380);
       } else {
         clearTimeout(state._autoTimer);
         state._autoTimer = setTimeout(() => { randHK(); showResult(); }, 450);
