@@ -2026,14 +2026,14 @@
       RAGM: 'May over-organize data and delay development — remember the demo needs to run first.',
       NCTO: 'Risk of becoming a single point of failure — all pressure converges on you.',
       DDL: 'Early pacing is uneven — risks all converge at the final moment.',
-      JJKM: 'May over-engineer in a short timeframe too long can drain you — need someone to maintain morale and MVP focus.',
+      JJKM: 'May over-engineer for such a short timeframe — need someone to keep morale up and the MVP in focus.',
       Local_runner: 'Easy to neglect deployment, compatibility, and other people\'s environments.',
       Exorcist: 'The whole team may treat you as the fire brigade, squeezing out your own tasks.',
       DEMO: 'Can\'t rely entirely on luck — need stable teammates as a safety net.',
       Gravekeeper: 'Being too strict may slow down rapid experimentation — sometimes "just ship it" matters more.',
       Interim_Architect: 'May over-design — need execution-focused teammates to push things forward.',
-      DDX: 'Strong improvisation skills aren\'t solid, even the best delivery gets dragged down by the demo.',
-      QZGS: 'May do a bit of everything than the product — need tech teammates to back up the claims.',
+      DDX: 'Improvisation only carries so far — if the tech underneath isn\'t solid, even the best delivery gets dragged down by the demo.',
+      QZGS: 'May spread too thin across everything — need tech teammates to back up what you pitch.',
       COVER: 'Cover-ups aren\'t magic — when judges dig deeper, real features need to hold up.',
       GLUE: 'Easy to carry too much emotional labor — remember the team isn\'t your sole responsibility.',
       GLUE: 'Easy to carry too much emotional labor alone may burn you out — learn to trust teammates and delegate.',
@@ -2042,6 +2042,29 @@
       Alchemist: 'Easy to get lost in experimentation — remember hackathons prize demo-ability above all.',
       'TIN-HAU': 'If the underlying features aren\'t solid, even the best delivery gets dragged down by the demo.',
       MCDULL: 'Needs clear tasks and a mentor — not suited for teams with no guidance.',
+    };
+
+    const personaRisks_HK = {
+      PROMPT: '容易把 AI 的幻覺當成產出，需要有人幫你做工程校驗。',
+      VIBE: '容易留下技術債，項目結構要靠別人收口，別一路 Accept 到 main 都炸了。',
+      AIAT: '如果只重包裝、不重穩定，容易被評判問穿，需要技術底子撐住場面。',
+      RAGM: '可能過度整理資料、耽誤開發節奏，記住黑客松要先跑起來再說。',
+      NCTO: '容易把自己變成單點故障，壓力全堆在自己身上，記得找人分擔。',
+      DDL: '前期節奏不穩，容易把風險全留到最後，別讓全隊等你一個人啟動。',
+      JJKM: '可能在短賽程裏過度建設，需要有人維持團隊士氣，也別在重構裏迷失 MVP 目標。',
+      Local_runner: '容易忽視部署、兼容、別人的電腦環境，「我這裏跑得到」不是終點。',
+      Exorcist: '容易被全隊當成救火隊，自己的任務被擠壓，學會講「先讓我做完自己的」。',
+      lucky: '不能全靠玄學，需要穩定隊友兜底，Demo 之神不是每次都眷顧。',
+      Gravekeeper: '如果太嚴格，可能拖慢極速試錯，黑客松有些時候要「先跑再說」。',
+      Interim_Architect: '可能想得太完整，需要落地型隊友推進，別讓完美成為交付的敵人。',
+      DDX: '臨場能力強，但再強的表達也會被 Demo 拖下水，需要技術兜底。',
+      QZGS: '容易甚麼都做一點，需要技術隊友幫你把吹過的牛實現。',
+      GLUE: '容易把太多情緒勞動扛在自己身上，記得團隊不是你一個人的責任。',
+      Cosmetologist: '如果後端和數據不穩，頁面做得再好都會斷，需要前後端協同。',
+      API: '容易被需求追着加接口，需要學會控邊界、學會講「這個做不完」。',
+      Alchemist: '容易沉迷實驗，忘記黑客松最重要的是可演示，煉丹要趕在提交前出丹。',
+      'TIN-HAU': '如果底層功能不穩，再強的表達也會被 Demo 拖下水。',
+      MCDULL: '需要明確分工和 mentor，不適合被丟進完全沒人帶的隊。',
     };
 
     // ==================== STATE ====================
@@ -2148,6 +2171,34 @@
       25: { title: 'Last 10 minutes before submission. You?', options: ['Submit now, don\'t touch anything else', 'Check files, links, demo path', 'Backup demo, record a screencast, check deploy link, PPT, and emergency talking points — all ready'] },
     };
 
+    const Q_HK = {
+      1: { title: '開賽後拿到賽題，你的第一反應是？', options: ['先用自己那顆性感的大腦開始拆題', '讓 AI 幫忙列方案，再人手篩選做得到的', '直接開 Prompt，拆需求、拆功能、拆 API，先定好項目骨架'] },
+      2: { title: '用 AI 寫 code 時，你通常怎樣做？', options: ['一定要配古法手搓，還要逐行仔細檢查', '讓 AI 寫局部 function，自己檢查後再 merge', 'Cursor / Claude / Copilot 一路協作，邊跑邊改'] },
+      3: { title: '面對一堆比賽規則、API 文件、PDF、FAQ，你會？', options: ['嘰哩咕嚕在說甚麼，我自有節奏', '挑重點，人手整理一份文件', '全部整理成知識庫／prompt context，讓團隊隨時查閱'] },
+      4: { title: '項目要接第三方 API，但文件很長，你會？', options: ['小心駛得萬年船，能不接就不接', '照著文件一步步試，先做好基本呼叫', '讓 AI 讀文件、生成呼叫示例，自己負責聯調和兜底'] },
+      5: { title: '當 model 開始胡說八道，你會？', options: ['果斷停止這場鬧劇，是時候展現真本事了', '適時變通，換個 model 或重新問一次', '補 context、加約束、設 Few-shot，調教到能用為止'] },
+      6: { title: '48 小時剛開始，你的開發節奏是？', options: ['知己知彼百戰百勝，先看看大家在做甚麼', '先定 MVP，按優先次序開發', '凌晨三點之前可以慢，三點之後我開始接管戰場'] },
+      7: { title: '項目做到一半，核心功能突然報錯，你會？', options: ['光速截圖，貼到團隊群組', '搜一下 error、問 AI、找隊友一起 debug', '開 log、下斷點、restart、清 cache……'] },
+      8: { title: 'Demo 在你的電腦跑得動，一換機器就 crash，你會？', options: ['起碼我這裏跑得到，先這樣吧', '盡量寫清楚運行環境和啟動步驟', '補環境設定、部署 script、backup 方案，盡量讓別人也跑得到'] },
+      9: { title: '距離提交只剩 2 小時，功能還差一大截，你會？', options: ['差一截也沒關係，不影響大局', '砍掉非核心功能，保住主流程能 demo', '跑得到的先跑，跑不到的想好一套 demo 說辭'] },
+      10: { title: '發現 code 越來越亂，你會？', options: ['繼續跑，跑得動就別停', '小範圍整理一下', '邊寫邊兜住關鍵結構'] },
+      11: { title: '開 repo 時，你最在意甚麼？', options: ['先寫得到 code 再說，結構現在不用想', '目錄清楚、README 簡單寫兩句', '分支規範、環境變數、README、Issue template 全部先安排好'] },
+      12: { title: '產品想法很多，功能越堆越多，你會？', options: ['每個想法都很好，捨不得刪，先列好清單再說', '還是先保住主流程，其他當拓展功能', '先劃好系統邊界和模組關係，決定哪些做、哪些砍'] },
+      13: { title: '你看到隊友把所有邏輯寫在一個 file 裏，你會？', options: ['跑得到就別動，改壞了更麻煩，不如不改', '提醒他拆走關鍵模組', '重構成模組化，順手補上 interface 說明和調用關係'] },
+      14: { title: '多人協作時，你怎樣看待 main 分支？', options: ['誰方便誰直接改', '重要功能 merge 前看一眼', 'main 是祖墳，亂 push 等於開賽自爆'] },
+      15: { title: '項目要部署、儲存、鑑權、log，你會？', options: ['這些太重了，Demo 可以先不管', '先按最低可用標準搭一套', '基建不穩我睡不著，一定要有基本的工程底盤'] },
+      16: { title: '組隊大廳裏個個都說自己「甚麼都懂一點」，你會？', options: ['快點組到隊最重要，既然都懂一點就一起上吧', '先問清楚每個人真正能交付甚麼', '技能、時間、角色、風險全部先對齊'] },
+      17: { title: '隊友突然失聯，他負責的模組沒人做，你會？', options: ['等他回來，他那部分是他的責任', '先提醒，同時準備好應急方案', '直接補位，先穩住節奏'] },
+      18: { title: '團隊開始瘋狂加需求，你會？', options: ['小孩子才做選擇，大家想做就全做吧', '提醒一下時間風險，建議砍掉低優先的', '先主流程、再亮點、最後才錦上添花'] },
+      19: { title: '兩個隊友為了方案吵起來，你會？', options: ['默默埋頭做事，保住進度，同時祈禱別找上我', '你們別吵了！退一步海闊天空，要吵去舞室吵！', 'Gogogo 化身判官，把爭論翻譯成執行決策'] },
+      20: { title: '你發現自己不是最強的那個，你會怎樣參與？', options: ['少說多做，絕不拖後腿', '對「最強」的定義沒興趣，做好分給我的部分就行', '主動找缺口補上：文件、測試、interface、PPT、群組訊息都能搬磚'] },
+      21: { title: '項目功能一般，但要上台 Demo，你會？', options: ['真誠才是必殺技，能展示多少就多少', '整理好主流程，不展示不穩定的功能', '把最穩的一條 path 包裝成完整故事，讓評判先看懂價值'] },
+      22: { title: '前端頁面還很粗糙，你會？', options: ['黑客松又不看樣子，實用至上', '起碼把主頁排版弄整齊', '就算數據是 mock，頁面也要像個真正的產品'] },
+      23: { title: '路演 PPT 怎麼做？', options: ['懂的都懂，把功能截圖堆上去', '我有強迫症，按背景、痛點、方案、demo、價值排好', '先寫一句能讓評判記住的話，再反推整套 narrative'] },
+      24: { title: '評判問到項目的短板，你會？', options: ['有問必答，直接承認還沒做完再說原因', '解釋現階段 MVP 範圍和後續計劃', '承認邊界，轉回價值，再補一個 roadmap'] },
+      25: { title: '正式提交前最後 10 分鐘，你會？', options: ['漂漂亮亮提交，完美收工', '再檢查一次檔案、連結、demo path', '備份 Demo，準備好錄屏、部署連結、PPT、應急說辭'] },
+    };
+
     const P_EN = {
       PROMPT: { name: 'Prompt Invoker', group: 'AI Summoner', desc: 'You excel at breaking vague requirements into Prompts, Agent workflows, API calls, and executable tasks.', oneliner: 'You are not writing code, you are summoning things your teammates cannot understand.', role: 'Best at AI requirement decomposition, Prompt design, agent task orchestration, and AI feature definition.' },
       VIBE: { name: 'Vibe Coder', group: 'AI Summoner', desc: 'You ride the vibe, Accept All, and make things run first.', oneliner: 'If the vibes are right, the code writes itself.', role: 'Best at rapid prototyping and turning ideas into clickable demos fast.' },
@@ -2169,6 +2220,29 @@
       Alchemist: { name: 'Cyber Alchemist', group: 'Tech Specialist', desc: 'You tune models, tweak parameters, manage VRAM, and negotiate with fate.', oneliner: 'Tuning is not superstition, it is personal.', role: 'Best at algorithm models and AI core capabilities.' },
       'TIN-HAU': { name: 'Demo Day Diva', group: 'Hidden Spotlight', desc: 'A hidden spotlight personality. You control the room, craft the story, and elevate the project.', oneliner: 'It is about lifting the entire team onto the stage.', role: 'Best at final pitch and high-risk feature demo.' },
       MCDULL: { name: 'McDull Competitor', group: 'Hidden Healing', desc: 'You may not be the strongest, but you are willing to learn, cooperate, and get things done.', oneliner: 'I might be a bit slow, but I am really trying.', role: 'Best starting from low-barrier tasks.' },
+    };
+
+    const P_HK = {
+      PROMPT: { name: 'Prompt 咒術召獸師', group: 'AI 召喚系', tags: ['Prompt', 'Agent', 'API 編排'], desc: '你擅長把一句模糊的需求拆成 Prompt、Agent 流程、API 調用和可執行任務。你在隊裏最大的價值不是親手寫完所有代碼，而是讓 AI、工具和隊友各自做對的事。', oneliner: '你不是在寫代碼，你是在召喚隊友看不懂的東西。', role: '適合負責 AI 需求拆解、Prompt 設計、智能體任務編排、AI 功能說明。', teammates: [{ name: 'Bug 驅魔師', reason: '幫你處理 AI 生成代碼裏的玄學 Bug。' }, { name: 'API 守門員', reason: '把你召喚出來的能力接成穩定接口。' }, { name: '快乾 AB 膠水', reason: '把你的複雜想法翻譯給全隊。' }] },
+      VIBE: { name: 'Vibe Coding 巫師', group: 'AI 召喚系', tags: ['Cursor', 'Accept All', '快速原型'], desc: '你擅長跟 AI IDE 共振，靠感覺、補全、Accept All 和即時試錯快速推進。你適合黑客松，因為黑客松好多時候不是要寫最優雅的代碼，而是要把東西整出來。', oneliner: '我不知道它為甚麼跑得動，但它確實跑起來了。', role: '適合負責快速原型、探索式開發、短時間把想法變成可點可看的版本。', teammates: [{ name: '主分支守墓人', reason: '防止你把 main 分支變成異世界。' }, { name: '臨時架構師', reason: '幫你把靈感整理成系統。' }, { name: '顏值擔保人', reason: '把你跑通的功能變成拿得出手的 Demo。' }] },
+      AIAT: { name: 'AI 套殼建築師', group: 'AI 召喚系', tags: ['產品化', 'API 集成', 'MVP'], desc: '你擅長把現成的模型、接口、前端框架和具體場景拼成一個完整產品。你不是純粹套殼，而是懂得怎樣把殼套得像一個真項目。', oneliner: 'API 一接，殼一套，行業解決方案就出現了。', role: '適合負責快速產品化、API 集成、垂直場景封裝、MVP 成品搭建。', teammates: [{ name: 'API 守門員', reason: '保證接口穩定。' }, { name: 'Demo Day 天后', reason: '幫你把套殼講成場景方案。' }, { name: 'Bug 驅魔師', reason: '負責 Demo 崩潰時救火。' }] },
+      RAGM: { name: 'RAG 倉管', group: 'AI 召喚系', tags: ['知識庫', 'RAG', '資料處理'], desc: '看到資料第一反應不是讀完，而是整理、切分、建索引、做檢索。適合處理賽題規則、行業資料、政策文件、產品 FAQ，讓隊伍答得更像專業團隊。', oneliner: '別急，先入庫。', role: '適合負責知識庫、資料整理、檢索增強、文檔解析、內容可信度控制。', teammates: [{ name: 'Deadline 戰神', reason: '幫你把整理變成交付。' }, { name: 'Prompt 咒術召獸師', reason: '把知識庫變成 AI 能力。' }, { name: 'Demo Day 天后', reason: '把資料轉成路演故事。' }] },
+      NCTO: { name: '深夜 CTO', group: '代碼爆肝系', tags: ['架構兜底', '深夜攻堅', '技術核心'], desc: '你是高壓後半程會突然覺醒的人。別人開始睏，你開始清醒；別人開始亂，你開始收口。適合做技術兜底、核心模組和最終交付負責人。', oneliner: '白天沉默，凌晨三點開始接管代碼宇宙。', role: '適合負責技術主心骨、架構兜底、深夜攻堅、核心功能落地。', teammates: [{ name: '快乾 AB 膠水', reason: '幫你分擔溝通壓力。' }, { name: '顏值擔保人', reason: '讓你的技術成果被看見。' }, { name: '主分支守墓人', reason: '幫你守住代碼安全線。' }] },
+      DDL: { name: 'Deadline 戰神', group: '代碼爆肝系', tags: ['衝刺', '最後關頭', '超頻'], desc: '越接近截止時間越強，最後兩小時能爆出別人一整天的產量。適合衝刺期補功能、補文檔、補 Demo，但最好別讓全隊都等你啟動。', oneliner: '不是我拖延，是我的 CPU 要有死線才睿頻得起來。', role: '適合負責衝刺階段、臨門一腳、緊急補功能、交付前搶救。', teammates: [{ name: '基建狂魔', reason: '提前鋪好交付底盤。' }, { name: '快乾 AB 膠水', reason: '提醒你關鍵節點。' }, { name: '顏值擔保人', reason: '在你趕功能時同步補展示。' }] },
+      JJKM: { name: '基建狂魔', group: '架構秩序系', tags: ['部署', '工程規範', 'CI/CD'], desc: '你相信黑客松都需要工程底盤。環境、部署、日誌、CI、配置、文檔，這些別人覺得「等陣先算」的事，你會提前處理好。', oneliner: '項目還未寫，Docker 和 README 已經站起來了。', role: '適合負責部署上線、環境配置、CI/CD、工程規範與穩定交付。', teammates: [{ name: 'Deadline 戰神', reason: '幫你把基建轉成快速交付。' }, { name: 'Vibe Coding 巫師', reason: '提供快速功能原型。' }, { name: 'Demo Day 天后', reason: '讓穩定底盤變成評判感受得到的價值。' }] },
+      Local_runner: { name: '本地能跑俠', group: '代碼爆肝系', tags: ['本地調試', '快速驗證', 'MVP'], desc: '你堅信「我電腦跑得到」就是階段性勝利。適合單機功能驗證、快速試錯，但需要隊友幫你把「本地勝利」變成「現場也跑得到」。', oneliner: '我這裏跑得到，說明宇宙起碼有一個角落是對的。', role: '適合負責單機功能驗證、快速試錯、現場演示機保底，但需要協作補位。', teammates: [{ name: '基建狂魔', reason: '把本地版本部署出去。' }, { name: 'Bug 驅魔師', reason: '處理換環境後的報錯。' }, { name: '顏值擔保人', reason: '幫你把跑得到變成好看。' }] },
+      Exorcist: { name: 'Bug 驅魔師', group: 'Debug 玄學系', tags: ['Debug', '修復', '救火'], desc: '重啟、清 cache、看 log、換瀏覽器，四件法器走天下。隊伍遇到報錯時，你就是最應該找的人。你不一定寫最多功能，但你能讓已經壞掉的東西重新動起來。', oneliner: '重啟、清 cache、看 log，黑客松三炷香。', role: '適合負責 Debug、故障排查、接口聯調、臨場修復、提交前巡檢。', teammates: [{ name: 'Prompt 咒術召獸師', reason: '他負責產出功能，你負責降妖除魔。' }, { name: '主分支守墓人', reason: '減少衝突和事故。' }, { name: 'Demo 歐皇', reason: '上台前一起保 Demo。' }] },
+      lucky: { name: 'Demo 歐皇', group: 'Debug 玄學系', tags: ['Demo', '路演', '臨場'], desc: '平時一直崩，上台那三分鐘剛好跑得到。你懂得揀最穩的鏈路展示，並在關鍵時刻讓項目看起來還活着。', oneliner: '平時不穩定，上台剛好穩定。', role: '適合負責現場演示、風險功能取捨、臨場路線設計、Demo 氣運管理。', teammates: [{ name: 'Bug 驅魔師', reason: '負責上台前最後一輪排雷。' }, { name: '基建狂魔', reason: '保證連結和部署別掉鏈子。' }, { name: 'Demo Day 天后', reason: '把幸運 Demo 講成高光時刻。' }] },
+      Gravekeeper: { name: '主分支守墓人', group: '架構秩序系', tags: ['Git', '規範', '代碼秩序'], desc: 'main 分支神聖不可侵犯，誰亂 push 誰就要被記一世。你是代碼秩序的守護者。黑客松時間好短，越短越容易亂，而你能用規範讓團隊少踩坑。', oneliner: 'main 分支不是分支，是祖墳。', role: '適合負責 Git 規範、代碼合併、版本管理、提交節奏、最終交付秩序。', teammates: [{ name: 'Vibe Coding 巫師', reason: '他提供快速功能，你負責控風險。' }, { name: 'Deadline 戰神', reason: '防止最後關頭亂合併。' }, { name: 'API 守門員', reason: '一起保障系統穩定。' }] },
+      Interim_Architect: { name: '臨時架構師', group: '產品路演系', tags: ['PPT', '敘事', '架構'], desc: '產品還未完全跑通，商業閉環已經畫了三層。擅長把零散功能講成一個系統，看得出項目邊界、模組關係、技術路線和評判關心的邏輯。', oneliner: '路演前十分鐘，突然畫出了三層架構和技術閉環。', role: '適合負責答辯 PPT、項目敘事、系統架構圖、價值提煉、材料整合。', teammates: [{ name: 'Deadline 戰神', reason: '幫你把架構落成 MVP。' }, { name: '顏值擔保人', reason: '把架構成果可視化。' }, { name: 'Prompt 咒術召獸師', reason: '快速補齊工具能力。' }] },
+      DDX: { name: '兜底俠', group: '團隊協作系', tags: ['救場', '補位', '靈活'], desc: '你擅長在不確定裏保住局面。賽題變、接口掛、隊友失聯、評判追問，你都能快速換打法。', oneliner: '方案可以換，氣勢不能掉。', role: '適合負責臨場應變、危機處理、方案切換、跨模組補位。', teammates: [{ name: '基建狂魔', reason: '提前減少事故。' }, { name: 'API 守門員', reason: '提供穩定底盤。' }, { name: 'Demo Day 天后', reason: '一起完成路演控場。' }] },
+      GLUE: { name: '快乾 AB 膠水', group: '團隊協作系', tags: ['溝通', '凝聚', '翻譯'], desc: '你能把前端、後端、產品、AI、社恐大神黏成一支隊伍。團隊溝通、分工協調、需求翻譯、衝突緩和全包，專治黑客松後半夜的崩潰、沉默、甩鍋。', oneliner: '隊友不是不配合，只是缺一個能把大家黏住的人。', role: '適合負責組隊大廳、隊友溝通、分工協調、需求翻譯、社群連接。', teammates: [{ name: '深夜 CTO', reason: '你負責溝通，他負責技術兜底。' }, { name: 'Prompt 咒術召獸師', reason: '幫他把複雜想法落到團隊。' }, { name: '顏值擔保人', reason: '一起改善用戶體驗和展示。' }] },
+      QZGS: { name: '全職高手', group: '團隊協作系', tags: ['補位', '兜底', '全能'], desc: '你是黑客松裏最實用的補位型人格。會少少前端、懂少少後端、能寫文檔、能測流程、能補 PPT，項目缺哪塊你就往哪搬。', oneliner: '不一定最強，但哪裏缺人我都能搬一手。', role: '適合負責兜底補位、跨模組整合、收尾衝刺、危機處理。', teammates: [{ name: 'Demo Day 天后', reason: '幫你把貢獻講出來。' }, { name: '臨時架構師', reason: '幫你明確優先級。' }, { name: 'Deadline 戰神', reason: '一起完成最後衝刺。' }] },
+      Cosmetologist: { name: '顏值擔保人', group: '專項技術系', tags: ['前端', 'UI', '假數據'], desc: '後端沒有數據，你也能先 Mock 出一個看起來很真的世界。你負責讓項目被看見：按鈕、動效、加載、Demo 頁面，能讓未完成的項目看起來像真產品。', oneliner: '功能可以簡陋，但第一眼不能像課程作業。', role: '適合負責前端頁面、交互呈現、假數據造景、Demo 視覺、用戶路徑。', teammates: [{ name: 'API 守門員', reason: '保證數據送得到。' }, { name: '本地能跑俠', reason: '快速跑通主流程。' }, { name: 'Demo Day 天后', reason: '一起打磨展示故事。' }] },
+      API: { name: 'API 守門員', group: '專項技術系', tags: ['後端', '接口', '聯調'], desc: '甚麼都能接 API，而甚麼 API 都可能在最關鍵時刻報錯。你的世界由接口組成，負責項目的真實連接——前端要數據，AI 要調用，Demo 要穩定。', oneliner: '只要文檔還看得懂，只要 token 還沒過期，你就能把系統接起來。', role: '適合負責後端接口、第三方服務、數據流、鑑權、聯調和系統連接。', teammates: [{ name: '顏值擔保人', reason: '形成完整產品閉環。' }, { name: 'Prompt 咒術召獸師', reason: '接入 AI 能力。' }, { name: '主分支守墓人', reason: '一起守住工程秩序。' }] },
+      Alchemist: { name: '賽博煉丹師', group: '專項技術系', tags: ['模型', '調參', 'AI 核心'], desc: '調模型、調參數、調顯存、調命運。你適合需要 AI 能力深度的項目，能讓「用了大模型」變成真的有技術含量。Loss 曲線就是你的心電圖。', oneliner: '調參不是迷信，是我和模型之間的私人恩怨。', role: '適合負責算法模型、數據實驗、評估指標、AI 核心能力、技術亮點。', teammates: [{ name: '顏值擔保人', reason: '幫你展示模型效果。' }, { name: 'Demo Day 天后', reason: '把技術深度講成人話。' }, { name: 'Deadline 戰神', reason: '提醒你及時收斂到 Demo。' }] },
+      'TIN-HAU': { name: 'Demo Day 天后', group: '隱藏高光人格', tags: ['隱藏', '路演', '高光'], desc: '隱藏高光人格。能控場、能包裝、能救場，把項目由「跑得到」講成「值得記住」。你不是純 PPT 人，你是把團隊成果推到聚光燈下的人。', oneliner: '不只是會講，而是能把全隊抬上舞台。', role: '適合負責最終路演、最高風險功能展示、臨場問答、關鍵節點壓軸。', teammates: [{ name: '深夜 CTO', reason: '保證底層真的跑得動。' }, { name: '基建狂魔', reason: '保證現場不掉線。' }, { name: '賽博煉丹師', reason: '提供講得出口的技術亮點。' }] },
+      MCDULL: { name: '參賽麥兜', group: '隱藏治癒人格', tags: ['隱藏', '新手', '治癒'], desc: '隱藏治癒人格。可能不是最強的開發者，也不是最會講的人，但願意學、願意配合、願意把事情做完。好的隊伍會讓麥兜變強，麥兜也會讓隊伍更有人情味。', oneliner: '我可能慢一點，但我真的有在努力。', role: '適合先由資料整理、競品調研、測試反饋、現場協助等低門檻任務入手。', teammates: [{ name: '快乾 AB 膠水', reason: '幫你理解團隊任務。' }, { name: '全職高手', reason: '帶你補位成長。' }, { name: '顏值擔保人', reason: '給你適合上手的小模組。' }] },
     };
         const TEAMMATE_EN = {
       'API守门员': 'API Gatekeeper', '颜值担保人': 'Visual Guarantor', 'Demo Day天后': 'Demo Day Diva',
@@ -2289,6 +2363,8 @@
         return { ...q, title: Q_EN[q.id].title, options: Q_EN[q.id].options };
       }
       if (state.lang === 'zh-HK') {
+        const h = Q_HK[q.id];
+        if (h) return { ...q, title: h.title, options: h.options };
         return { ...q, title: s2t(q.title), options: q.options.map(o => s2t(o)) };
       }
       return q;
@@ -2305,6 +2381,15 @@
         return { ...p, ...pe, teammates };
       }
       if (state.lang === 'zh-HK') {
+        const hk = P_HK[p.id];
+        if (hk) {
+          const teammates = (hk.teammates || []).map((t, i) => ({
+            name: t.name,
+            origName: (p.teammates && p.teammates[i] ? p.teammates[i].name : t.name),
+            reason: t.reason,
+          }));
+          return { ...p, ...hk, teammates };
+        }
         const teammates = (p.teammates || []).map(t => ({
           name: s2t(t.name),
           origName: t.name,
@@ -2722,8 +2807,11 @@
       // Role & Risk two-col
       document.getElementById('result-role').textContent = persona.role || persona.desc;
       const riskEN = personaRisks_EN[rawPersona.id] || 'No special warnings — keep rocking your style.';
-      const riskText = state.lang === 'en' ? riskEN : (personaRisks[rawPersona.id] || '暂无特别提醒，保持你的风格继续前进。');
-      document.getElementById('result-risk').textContent = state.lang === 'zh-HK' ? s2t(riskText) : riskText;
+      let riskText;
+      if (state.lang === 'en') riskText = riskEN;
+      else if (state.lang === 'zh-HK') riskText = personaRisks_HK[rawPersona.id] || s2t(personaRisks[rawPersona.id] || '暫無特別提醒，保持你的風格繼續前進。');
+      else riskText = personaRisks[rawPersona.id] || '暂无特别提醒，保持你的风格继续前进。';
+      document.getElementById('result-risk').textContent = riskText;
 
       // Teammates
       const tc = document.getElementById('tm-chips');
@@ -2790,23 +2878,46 @@
       hideQuiz();
     });
     document.getElementById('share-btn').addEventListener('click', () => {
-      if (typeof html2canvas !== 'undefined') {
-        doShareCapture();
+      const shareUrl = location.origin + location.pathname;
+      const shareTitle = 'HCTI 黑客松人格测试';
+      const shareText = '我测出了我的黑客松人设，快来测测你是哪一个 →';
+      const inWeChat = /micromessenger/i.test(navigator.userAgent);
+      if (inWeChat) { showWeixinShareHint(); return; }
+      if (navigator.share) {
+        navigator.share({ title: shareTitle, text: shareText, url: shareUrl })
+          .catch(err => { if (!(err && err.name === 'AbortError')) copyShareLink(shareUrl); });
         return;
       }
-      document.getElementById('share-loading').style.display = 'flex';
-      const s = document.createElement('script');
-      s.src = 'html2canvas.min.js';
-      s.onload = () => {
-        document.getElementById('share-loading').style.display = 'none';
-        doShareCapture();
-      };
-      s.onerror = () => {
-        document.getElementById('share-loading').style.display = 'none';
-        alert('分享功能加载失败，请检查网络后重试');
-      };
-      document.head.appendChild(s);
+      copyShareLink(shareUrl);
     });
+
+    function copyShareLink(url) {
+      const done = () => alert('测试链接已复制，粘贴发给好友即可：\n' + url);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(done).catch(() => fallbackCopyLink(url, done));
+      } else {
+        fallbackCopyLink(url, done);
+      }
+    }
+    function fallbackCopyLink(url, done) {
+      const ta = document.createElement('textarea');
+      ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) { prompt('复制下面的链接发给好友：', url); }
+      document.body.removeChild(ta);
+    }
+    function showWeixinShareHint() {
+      let hint = document.getElementById('wx-share-hint');
+      if (!hint) {
+        hint = document.createElement('div');
+        hint.id = 'wx-share-hint';
+        hint.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.82);display:flex;align-items:flex-start;justify-content:flex-end;padding:18px;cursor:pointer;';
+        hint.innerHTML = '<div style="color:#fff;max-width:300px;text-align:right;font-size:15px;line-height:1.75;margin-top:4px;">点击右上角 <span style="font-size:24px;vertical-align:middle;">···</span><br>选择「发送给朋友」或「分享到朋友圈」<br>好友打开即可直接测试 →<br><br><span style="font-size:13px;opacity:0.65;">（点任意处关闭）</span></div>';
+        hint.addEventListener('click', () => { hint.style.display = 'none'; });
+        document.body.appendChild(hint);
+      }
+      hint.style.display = 'flex';
+    }
 
     function downloadBlob(blob, name) {
       const u = URL.createObjectURL(blob);
